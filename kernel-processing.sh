@@ -18,6 +18,14 @@ function search_files {
     echo "`ls -lR $1/* | grep -i $2 | wc -l`"
 }
 
+function search_string {
+    declare -i count=0
+    for f in `find $1/* -type f`; do
+        count=$count+`grep -io "$2" < "$f" | wc -w`
+    done
+    echo "$count"
+}
+
 while getopts ":s:v:t:h" opt; do
 case $opt in
     s)
@@ -109,7 +117,7 @@ then
     exit 1
 else
     # Validate what to do when the directory is not empty.
-    tar xvf $K_DIRECTORY/$K_NAME -C $K_DIRECTORY/pre
+    #tar xvf $K_DIRECTORY/$K_NAME -C $K_DIRECTORY/pre
     log "INFO: Extracted the kernel $K_NAME to dir $K_DIRECTORY/pre."
 fi
 
@@ -148,11 +156,27 @@ SUMFILES=$((SUMFILES+NFILES))
 TFILES=`find $K_DIRECTORY/pre -type f | wc -l`
 log "INFO: # of other files $((TFILES-SUMFILES))"
 #    Total number of files
-echo "Total number of files: $TFILES"
+log "INFO: Total number of files: $TFILES"
 #    # of ocurrences for Linus
+log "INFO: # of ocurrences of Linus in files = "`search_string $K_DIRECTORY/pre "Linus"`
 #    # of architectures/directories found under arch/
+log "INFO: # of architechture directories listed under arch/ = "`ls -l $K_DIRECTORY/pre/*/arch | grep ^d | wc -l`
+#log "INFO: # of architechture directories listed under arch/ = "`find $K_DIRECTORY/pre/*/arch -maxdepth 1 -type d | wc -l`
 #    # of ocurrences for kernel_start
+log "INFO: # of ocurrences of kernel_start in files = "`search_string $K_DIRECTORY/pre "kernel_start"`
 #    # of ocurrences for __init
+log "INFO: # of ocurrences of __init in files = "`search_string $K_DIRECTORY/pre "_init"`
 #    # of files in its filename containing the word gpio
+log "INFO: # of ocurrences of gpio in filenames = "`search_files $K_DIRECTORY/pre "gpio"`
 #    # of ocurrences for #include <linux/module.h>
+log "INFO: # of ocurrences of #include <linux/module.h> in files = "`search_string $K_DIRECTORY/pre '\#include <linux/module.h>'`
 
+
+#Some Tasks To Do
+
+#    Sort in alphabetical order all #include <linux/*> under drivers/i2c/ Make sure you identify all files you have modified, you will need their identity in the post processing phase
+
+#    Let's populate our file called intel.contributors under our top level working directory directory, search for all Intel contributors matching @intel.com and identify the file where their name was located, one line per contributor and cannot repeat contributor e.g.
+
+#Path/to/file.c | Sara Sharp
+#Path/to/file.c | Darren Hart
