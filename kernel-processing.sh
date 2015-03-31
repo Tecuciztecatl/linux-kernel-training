@@ -26,6 +26,7 @@ function search_string {
     echo "$count"
 }
 
+# Still needs work
 function search_contributor {
 #grep -Eo "[A-Za-z0-9\.\_\-]+@intel.com"
     for f in `find $1/* -type f`; do
