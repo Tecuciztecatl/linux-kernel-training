@@ -26,6 +26,15 @@ function search_string {
     echo "$count"
 }
 
+function search_contributor {
+#grep -Eo "[A-Za-z0-9\.\_\-]+@intel.com"
+    for f in `find $1/* -type f`; do
+        if grep -qio "$2" < "$f"
+            echo "$f | $2"
+        fi
+    done
+}
+
 while getopts ":s:v:t:h" opt; do
 case $opt in
     s)
